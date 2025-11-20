@@ -5,57 +5,52 @@ import com.wavebreaker.models.Player;
 
 public class CombatManager {
     private Player player;
-    private Enemy currentEnemy;
+    private Enemy enemy;
 
-    public void startCombat(Player p, Enemy e) {
-        this.player = p;
-        this.currentEnemy = e;
+    public void startCombat(Player player, Enemy enemy) {
+        this.player = player;
+        this.enemy = enemy;
+
+        this.player.resetAllStates();
     }
 
-    // Mengecek apakah pertarungan selesai [cite: 9]
     public boolean isCombatOver() {
-        if (!currentEnemy.isAlive()) {
-            System.out.println("MUSUH KALAH!");
-            return true;
-        }
-        if (!player.isAlive()) {
-            System.out.println("GAME OVER! Anda Kalah.");
-            System.exit(0); // Keluar program
-        }
-        return false;
+        return !(this.player.isAlive() && this.enemy.isAlive());
     }
 
-    // Logika Giliran Player [cite: 22-26]
+    public boolean isPlayerWin() {
+        return this.player.isAlive() && !this.enemy.isAlive();
+    }
+
+    public int getEnemyExpReward() {
+        if (this.isPlayerWin()) {
+            return this.enemy.getExpReward();
+        }
+
+        return 0;
+    }
+
     public void processPlayerTurn(String action) {
         if (action.equalsIgnoreCase("1")) {
-            player.attack(currentEnemy);
+            this.player.attack(this.enemy);
         } else if (action.equalsIgnoreCase("2")) {
-            player.heal();
+            this.player.heal();
         } else {
             System.out.println("Aksi tidak dikenal, giliran terlewat!");
         }
 
-        // Cek apakah musuh mati setelah diserang [cite: 27]
-        if (currentEnemy.isAlive()) {
-            processEnemyTurn(); // Jika hidup, musuh membalas [cite: 28-29]
+        if (this.enemy.isAlive()) {
+            this.processEnemyTurn();
         }
-
-        processRoundEnd(); // Pembersihan akhir ronde [cite: 31]
     }
 
-    // Logika Giliran Musuh [cite: 29]
     private void processEnemyTurn() {
-        currentEnemy.attack(player);
+        this.enemy.attack(this.player);
+        this.processRoundEnd();
     }
 
-    // Akhir Ronde & Cooldown [cite: 33-34]
     private void processRoundEnd() {
-        player.decreaseSkillCooldown();
-        // enemy.decreaseSkillCooldown(); (jika ada)
-        System.out.println("--- Akhir Ronde (HP Player: " + player.getCurrentHp() + ") ---");
-    }
-
-    public Enemy getCurrentEnemy() {
-        return currentEnemy;
+        this.player.decreaseSkillCooldown();
+        this.enemy.decreaseSkillCooldown();
     }
 }

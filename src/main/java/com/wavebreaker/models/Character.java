@@ -3,51 +3,51 @@ package com.wavebreaker.models;
 public abstract class Character {
     protected String name;
     protected int maxHP;
-    protected int currentHp;
+    protected int currentHP;
     protected int strength;
 
     public Character(String name, int maxHP, int strength) {
         this.name = name;
         this.maxHP = maxHP;
-        this.currentHp = maxHP;
+        this.currentHP = maxHP;
         this.strength = strength;
     }
 
     public void takeDamage(int damage) {
-        this.currentHp -= damage;
+        this.currentHP -= damage;
 
-        if (this.currentHp < 0) {
-            this.currentHp = 0;
+        if (this.currentHP < 0) {
+            this.currentHP = 0;
         }
 
-        System.out.println(this.name + " terkena " + damage + " damage. Sisa HP: " + this.currentHp);
+        System.out.println(this.name + " terkena " + damage + " damage. Sisa HP: " + this.currentHP);
     }
 
     public abstract void attack(Character target);
     public abstract void getInfo();
 
     public boolean isAlive() {
-        return this.currentHp > 0;
+        return this.currentHP > 0;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getMaxHp() {
+    public int getMaxHP() {
         return maxHP;
     }
 
-    public int getCurrentHp() {
-        return currentHp;
+    public int getCurrentHP() {
+        return currentHP;
     }
 
     public int getStrength() {
         return strength;
     }
 
-    public void setCurrentHp(int currentHp) {
-        this.currentHp = currentHp;
+    public void setCurrentHP(int currentHP) {
+        this.currentHP = currentHP;
     }
 
     public void setMaxHP(int maxHP) {

@@ -37,10 +37,10 @@ public class Player extends Character {
 
     public void heal() {
         if (this.healSkill.isReady()) {
-            super.currentHp += calculateHealAmount();
+            super.currentHP += calculateHealAmount();
 
-            if (super.currentHp > super.maxHP) {
-                super.currentHp = super.maxHP;
+            if (super.currentHP > super.maxHP) {
+                super.currentHP = super.maxHP;
             }
 
             this.healSkill.use();
@@ -51,7 +51,7 @@ public class Player extends Character {
     public void getInfo() {
         System.out.println("===== Player Info =====");
         System.out.println("Name: " + super.name);
-        System.out.println("HP: " + super.currentHp + "/" + super.maxHP);
+        System.out.println("HP: " + super.currentHP + "/" + super.maxHP);
         System.out.println("Strength: " + super.strength);
         System.out.println("Level: " + this.level);
         System.out.println("EXP: " + this.currentExp + "/" + LevelingManager.getExpRequirement(this.level));
@@ -85,7 +85,7 @@ public class Player extends Character {
     public void resetAllStates() {
         this.attackSkill.resetCooldown();
         this.healSkill.resetCooldown();
-        super.setCurrentHp(super.maxHP);
+        super.setCurrentHP(super.maxHP);
     }
 
     private int calculateHealAmount() {

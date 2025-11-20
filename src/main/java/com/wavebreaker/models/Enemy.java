@@ -37,7 +37,7 @@ public class Enemy extends Character {
         System.out.println("===== Enemy Info =====");
         System.out.println("Name: " + this.name);
         System.out.println("Type: " + this.enemyType);
-        System.out.println("HP: " + this.currentHp + "/" + this.maxHP);
+        System.out.println("HP: " + super.currentHP + "/" + super.maxHP);
         System.out.println("Strength: " + this.strength);
         System.out.println("EXP Reward: " + this.expReward);
         System.out.println("===== Skill Info =====");
@@ -48,8 +48,8 @@ public class Enemy extends Character {
         this.attackSkill.decreaseCooldown();
     }
 
-    public Enemy copy(int newStrength, int newMaxHp) {
-        return new Enemy(this.name, newMaxHp, newStrength, this.expReward, this.enemyType);
+    public Enemy copy(int newStrength, int newMaxHp, int newExpReward) {
+        return new Enemy(this.name, newMaxHp, newStrength, newExpReward, this.enemyType);
     }
 
     public int getExpReward() {

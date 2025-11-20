@@ -12,15 +12,15 @@ public class Enemy extends Character {
 
         switch (enemyType) {
             case EnemyType.BOSS:
-                this.attackSkill = new Skill("Basic attack", 4);
+                this.attackSkill = new Skill("Basic attack", 3);
                 break;
 
             case EnemyType.ELITE:
-                this.attackSkill = new Skill("Basic attack", 2);
+                this.attackSkill = new Skill("Basic attack", 1);
                 break;
 
             default:
-                this.attackSkill = new Skill("Basic attack", 1);
+                this.attackSkill = new Skill("Basic attack", 0);
         }
     }
 
@@ -33,7 +33,7 @@ public class Enemy extends Character {
     }
 
     @Override
-    public void getInfo() {
+    public void showInfo() {
         System.out.println("===== Enemy Info =====");
         System.out.println("Name: " + this.name);
         System.out.println("Type: " + this.enemyType);

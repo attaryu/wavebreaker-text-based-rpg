@@ -1,8 +1,10 @@
 package com.wavebreaker.models;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.wavebreaker.managers.LevelingManager;
+import com.wavebreaker.utils.Input;
 
 public class Player extends Character {
     private int level;
@@ -16,22 +18,24 @@ public class Player extends Character {
     private int unusedStatPoints;
 
     public Player(String name) {
-        super(name, 100, 10);
+        super(name, 120, 12);
+
         this.level = 1;
         this.currentExp = 0;
-
         this.baseStats = LevelingManager.getBaseStatPoint();
-        this.recalculateStats();
+        this.allocatedStats = new HashMap<String, Integer>();
+        this.unusedStatPoints = 0;
+        this.attackSkill = new Skill("Attack", 0);
+        this.healSkill = new Skill("Heal", 4);
 
-        this.attackSkill = new Skill("Attack", 1);
-        this.healSkill = new Skill("Heal", 3);
+        this.recalculateStats();
     }
 
     @Override
     public void attack(Character target) {
         if (this.attackSkill.isReady()) {
-            target.takeDamage(super.strength);
             this.attackSkill.use();
+            target.takeDamage(super.strength);
         }
     }
 
@@ -48,17 +52,47 @@ public class Player extends Character {
     }
 
     @Override
-    public void getInfo() {
+    public void showInfo() {
         System.out.println("===== Player Info =====");
         System.out.println("Name: " + super.name);
         System.out.println("HP: " + super.currentHP + "/" + super.maxHP);
         System.out.println("Strength: " + super.strength);
         System.out.println("Level: " + this.level);
         System.out.println("EXP: " + this.currentExp + "/" + LevelingManager.getExpRequirement(this.level));
+
+        this.showSkillInfo();
+    }
+
+    public void showSkillInfo() {
         System.out.println("===== Skill Info =====");
-        System.out.println("Attack Cooldown: " + this.attackSkill.getCurrentCooldown());
-        System.out.println("Heal amount: " + calculateHealAmount());
-        System.out.println("Heal Cooldown: " + this.healSkill.getCurrentCooldown());
+        if (this.attackSkill.isReady()) {
+            System.out.println("[1] Serangan siap digunakan.");
+        } else {
+            System.out.println("[x] Cooldown Serangan: " + this.attackSkill.getCurrentCooldown());
+        }
+
+        if (this.healSkill.isReady()) {
+            System.out.println("[2] Penyembuhan siap digunakan. " + calculateHealAmount() + " HP akan dipulihkan.");
+        } else {
+            System.out.println("[x] Cooldown Penyembuhan: " + this.healSkill.getCurrentCooldown());
+        }
+    }
+
+    public void showStat() {
+        System.out.println("===== Statistik =====");
+
+        for (String stat : this.baseStats.keySet()) {
+            System.out.println("- " + stat + " dasar: " + this.baseStats.get(stat));
+        }
+
+        System.out.println("---------------------");
+
+        for (String stat : this.allocatedStats.keySet()) {
+            System.out.println("- " + stat + " teralokasi: " + this.allocatedStats.get(stat));
+        }
+
+        System.out.println("Poin statistik yang belum digunakan: " + this.unusedStatPoints);
+        System.out.println("Statistik yang dialokasikan: ");
     }
 
     public void gainExp(int expAmount) {
@@ -66,15 +100,51 @@ public class Player extends Character {
         this.checkLevelUp();
     }
 
-    public void allocateStatPoint(String statName, int points) {
-        if (this.unusedStatPoints > 0 && points <= this.unusedStatPoints) {
+    public void allocateStatPoint() {
+        this.showStat();
+
+        String statName = Input.get("Pilih statistik untuk dialokasikan atau batal (STR/VIT/n):");
+
+        if (statName.equalsIgnoreCase("n")) {
+            return;
+        }
+
+        if (statName == null || (!statName.equalsIgnoreCase("STR")
+                && !statName.equalsIgnoreCase("VIT")
+                && !statName.equalsIgnoreCase("n"))) {
+            System.out.println("Input tidak dikenal, Ulangi lagi.");
+            allocateStatPoint();
+
+            return;
+        }
+
+        int points = Integer.parseInt(Input.get("Masukkan jumlah poin:"));
+
+        if (points <= 0) {
+            System.out.println("Jumlah poin harus lebih dari 0, ulangi lagi.");
+            allocateStatPoint();
+
+            return;
+        }
+
+        if (this.unusedStatPoints > 0) {
+            statName = statName.toUpperCase();
+
             int currentAllocated = this.allocatedStats.getOrDefault(statName, 0);
 
             this.allocatedStats.put(statName, currentAllocated + points);
             this.unusedStatPoints -= points;
 
             recalculateStats();
+
+            if (this.isPlayerHasUnusedStatPoints()) {
+                allocateStatPoint();
+            }
+
+            return;
         }
+
+        System.out.println("Poin statistik tidak mencukupi!");
     }
 
     public void decreaseSkillCooldown() {
@@ -88,21 +158,26 @@ public class Player extends Character {
         super.setCurrentHP(super.maxHP);
     }
 
+    public boolean isPlayerHasUnusedStatPoints() {
+        return this.unusedStatPoints > 0;
+    }
+
     private int calculateHealAmount() {
-        return super.maxHP / 5;
+        return (int) (super.maxHP * 0.35);
     }
 
     private void checkLevelUp() {
         int expRequirement = LevelingManager.getExpRequirement(this.level);
 
         while (this.currentExp >= expRequirement) {
-            processLevelUp();
+            processLevelUp(expRequirement);
             expRequirement = LevelingManager.getExpRequirement(this.level);
         }
     }
 
-    private void processLevelUp() {
-        this.currentExp -= LevelingManager.getExpRequirement(this.level);
+    private void processLevelUp(int expRequirement) {
+        this.currentExp -= expRequirement;
+
         this.level++;
 
         Map<String, Integer> levelUpbaseStats = LevelingManager.getBaseStatPoint();
@@ -112,7 +187,12 @@ public class Player extends Character {
             this.baseStats.put(stat, currentBase + levelUpbaseStats.get(stat));
         }
 
-        this.unusedStatPoints += LevelingManager.getAllocatedStatPoints();
+        int allocatedPoints = LevelingManager.getAllocatedStatPoints();
+        this.unusedStatPoints += allocatedPoints;
+
+        System.out.println("Selamat! Anda naik level " + this.level + "!");
+        System.out.println(allocatedPoints + " poin statistik telah ditambahkan!");
+
         this.recalculateStats();
     }
 
@@ -120,8 +200,8 @@ public class Player extends Character {
         int STR = getStat("STR");
         int VIT = getStat("VIT");
 
-        super.setMaxHP(100 + (VIT * 10));
-        super.setStrength(10 + (STR * 2));
+        super.setMaxHP(120 + (VIT * 8));
+        super.setStrength(12 + (STR * 3));
     }
 
     private int getStat(String name) {

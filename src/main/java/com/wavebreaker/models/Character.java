@@ -24,7 +24,7 @@ public abstract class Character {
     }
 
     public abstract void attack(Character target);
-    public abstract void getInfo();
+    public abstract void showInfo();
 
     public boolean isAlive() {
         return this.currentHP > 0;

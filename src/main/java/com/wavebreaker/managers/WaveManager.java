@@ -8,29 +8,31 @@ import com.wavebreaker.models.EnemyType;
 
 public class WaveManager {
     private final int MAX_WAVES = 10;
-    private final double HP_MULTIPLIER = 1.5;
-    private final double STRENGTH_MULTIPLIER = 1.2;
-    private final double EXP_MULTIPLIER = 1.3;
+    private final double HP_MULTIPLIER = 1.25;
+    private final double STRENGTH_MULTIPLIER = 1.15;
+    private final double EXP_MULTIPLIER = 1.2;
 
     private final List<Enemy> normalEnemies = new ArrayList<Enemy>();
     private final List<Enemy> eliteEnemies = new ArrayList<Enemy>();
     private final List<Enemy> bossEnemies = new ArrayList<Enemy>();
 
-    private int currentWave = 1;
+    private int currentWave = 0;
 
     public WaveManager() {
-        this.normalEnemies.add(new Enemy("Goblin", 100, 10, 20, EnemyType.NORMAL));
-        this.normalEnemies.add(new Enemy("Orc", 150, 15, 30, EnemyType.NORMAL));
+        this.normalEnemies.add(new Enemy("Goblin", 80, 12, 50, EnemyType.NORMAL));
+        this.normalEnemies.add(new Enemy("Orc", 120, 15, 60, EnemyType.NORMAL));
 
-        this.eliteEnemies.add(new Enemy("Troll", 300, 25, 50, EnemyType.ELITE));
-        this.eliteEnemies.add(new Enemy("Dark Knight", 400, 30, 70, EnemyType.ELITE));
+        this.eliteEnemies.add(new Enemy("Troll", 250, 22, 120, EnemyType.ELITE));
+        this.eliteEnemies.add(new Enemy("Dark Knight", 300, 28, 150, EnemyType.ELITE));
 
-        this.bossEnemies.add(new Enemy("Dragon", 1000, 50, 200, EnemyType.BOSS));
-        this.bossEnemies.add(new Enemy("Demon Lord", 1200, 60, 250, EnemyType.BOSS));
+        this.bossEnemies.add(new Enemy("Dragon", 600, 40, 300, EnemyType.BOSS));
+        this.bossEnemies.add(new Enemy("Demon Lord", 700, 45, 350, EnemyType.BOSS));
     }
 
     public Enemy nextWave() {
         this.currentWave++;
+
+        System.out.println("Gelombang " + this.currentWave + " dimulai!");
 
         if (this.currentWave % 10 == 0) {
             return this.scaleEnemy(this.spawnBossEnemy());
@@ -41,8 +43,12 @@ public class WaveManager {
         }
     }
 
-    public boolean isMaxWaveReached() {
-        return this.currentWave >= this.MAX_WAVES;
+    public boolean isWavesEnded() {
+        return this.currentWave > this.MAX_WAVES;
+    }
+
+    public int getCurrentWave() {
+        return this.currentWave;
     }
 
     private Enemy scaleEnemy(Enemy enemy) {
@@ -58,10 +64,12 @@ public class WaveManager {
     }
 
     private Enemy spawnEliteEnemy() {
+        System.out.println("Musuh Elite muncul!");
         return this.getRandomEnemy(eliteEnemies);
     }
 
     private Enemy spawnBossEnemy() {
+        System.out.println("Boss Musuh muncul!");
         return this.getRandomEnemy(bossEnemies);
     }
 

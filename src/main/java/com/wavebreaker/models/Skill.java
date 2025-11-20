@@ -17,6 +17,7 @@ public class Skill {
 
     public void use() {
         this.currentCooldown = BASE_COOLDOWN;
+        System.out.println("Skill " + this.name + " digunakan!");
     }
 
     public void decreaseCooldown() {
@@ -25,12 +26,8 @@ public class Skill {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
     public int getCurrentCooldown() {
-        return currentCooldown;
+        return this.currentCooldown;
     }
 
     public void resetCooldown() {

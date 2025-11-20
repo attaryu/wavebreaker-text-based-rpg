@@ -1,4 +1,4 @@
-package com.wavebreaker;
+package com.wavebreaker.models;
 
 public class Enemy extends Character {
     private int expReward;

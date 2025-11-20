@@ -1,6 +1,9 @@
-package com.wavebreaker;
+package com.wavebreaker.models;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import com.wavebreaker.managers.LevelingManager;
 
 public class Player extends Character {
     private int level;
@@ -28,7 +31,8 @@ public class Player extends Character {
     public void heal() {
         int healAmount = 20; // Contoh nilai heal
         this.currentHp += healAmount;
-        if (this.currentHp > this.maxHp) this.currentHp = this.maxHp;
+        if (this.currentHp > this.maxHp)
+            this.currentHp = this.maxHp;
         System.out.println(this.name + " memulihkan diri sebesar " + healAmount + " HP.");
     }
 
@@ -39,7 +43,7 @@ public class Player extends Character {
         checkLevelUp();
     }
 
-    // Menggunakan LevelingManager untuk cek syarat level up 
+    // Menggunakan LevelingManager untuk cek syarat level up
     private void checkLevelUp() {
         int reqExp = LevelingManager.getExpRequirement(this.level);
         while (this.currentExp >= reqExp) {
@@ -51,12 +55,12 @@ public class Player extends Character {
     private void levelUp() {
         this.currentExp -= LevelingManager.getExpRequirement(this.level);
         this.level++;
-        
+
         // Update stat saat level up
         this.maxHp = LevelingManager.calculateNewMaxHp(this.level);
         this.strength = LevelingManager.calculateNewStrength(this.level);
         this.currentHp = this.maxHp; // Full heal saat level up
-        
+
         System.out.println("LEVEL UP! Sekarang level " + this.level);
     }
 

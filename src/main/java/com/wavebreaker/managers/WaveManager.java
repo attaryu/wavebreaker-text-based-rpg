@@ -2,9 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package com.wavebreaker;
+package com.wavebreaker.managers;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import com.wavebreaker.models.Enemy;
 
 public class WaveManager {
     private List<Enemy> enemyTemplates;
@@ -28,13 +31,13 @@ public class WaveManager {
         // Contoh sederhana: ambil template pertama lalu rotasi
         int index = (currentWave - 1) % enemyTemplates.size();
         Enemy template = enemyTemplates.get(index);
-        
+
         Enemy newEnemy = template.copy(); // Menggunakan fitur clone
         newEnemy.scaleStats(currentWave); // Perkuat musuh
-        
+
         System.out.println("\n=== WAVE " + currentWave + " DIMULAI! ===");
         System.out.println("Musuh muncul: " + newEnemy.getName() + " (HP: " + newEnemy.getCurrentHp() + ")");
-        
+
         currentWave++;
         return newEnemy;
     }

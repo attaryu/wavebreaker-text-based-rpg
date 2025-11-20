@@ -1,4 +1,7 @@
-package com.wavebreaker;
+package com.wavebreaker.managers;
+
+import com.wavebreaker.models.Enemy;
+import com.wavebreaker.models.Player;
 
 public class CombatManager {
     private Player player;
@@ -36,7 +39,7 @@ public class CombatManager {
         if (currentEnemy.isAlive()) {
             processEnemyTurn(); // Jika hidup, musuh membalas [cite: 28-29]
         }
-        
+
         processRoundEnd(); // Pembersihan akhir ronde [cite: 31]
     }
 
@@ -51,7 +54,7 @@ public class CombatManager {
         // enemy.decreaseSkillCooldown(); (jika ada)
         System.out.println("--- Akhir Ronde (HP Player: " + player.getCurrentHp() + ") ---");
     }
-    
+
     public Enemy getCurrentEnemy() {
         return currentEnemy;
     }

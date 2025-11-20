@@ -2,43 +2,59 @@ package com.wavebreaker.models;
 
 public abstract class Character {
     protected String name;
-    protected int maxHp;
+    protected int maxHP;
     protected int currentHp;
     protected int strength;
 
-    public Character(String name, int maxHp, int strength) {
+    public Character(String name, int maxHP, int strength) {
         this.name = name;
-        this.maxHp = maxHp;
-        this.currentHp = maxHp;
+        this.maxHP = maxHP;
+        this.currentHp = maxHP;
         this.strength = strength;
     }
 
-    // Method dasar untuk combat
     public void takeDamage(int damage) {
         this.currentHp -= damage;
-        if (this.currentHp < 0)
+
+        if (this.currentHp < 0) {
             this.currentHp = 0;
+        }
+
         System.out.println(this.name + " terkena " + damage + " damage. Sisa HP: " + this.currentHp);
     }
+
+    public abstract void attack(Character target);
+    public abstract void getInfo();
 
     public boolean isAlive() {
         return this.currentHp > 0;
     }
 
-    // Getters
     public String getName() {
         return name;
     }
 
-    public int getStrength() {
-        return strength;
+    public int getMaxHp() {
+        return maxHP;
     }
 
     public int getCurrentHp() {
         return currentHp;
     }
 
-    // Abstract method agar Player dan Enemy mengimplementasikan cara serang
-    // masing-masing
-    public abstract void attack(Character target);
+    public int getStrength() {
+        return strength;
+    }
+
+    public void setCurrentHp(int currentHp) {
+        this.currentHp = currentHp;
+    }
+
+    public void setMaxHP(int maxHP) {
+        this.maxHP = maxHP;
+    }
+
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
 }

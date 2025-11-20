@@ -1,73 +1,131 @@
 package com.wavebreaker.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import com.wavebreaker.managers.LevelingManager;
 
 public class Player extends Character {
     private int level;
     private int currentExp;
-    private List<Skill> skills;
+
+    private Skill attackSkill;
+    private Skill healSkill;
+
+    private Map<String, Integer> baseStats;
+    private Map<String, Integer> allocatedStats;
+    private int unusedStatPoints;
 
     public Player(String name) {
-        super(name, 100, 10); // Stat awal
+        super(name, 100, 10);
         this.level = 1;
         this.currentExp = 0;
-        this.skills = new ArrayList<>();
-    }
 
-    public void addSkill(Skill skill) {
-        this.skills.add(skill);
+        this.baseStats = LevelingManager.getBaseStatPoint();
+        this.recalculateStats();
+
+        this.attackSkill = new Skill("Attack", 1);
+        this.healSkill = new Skill("Heal", 3);
     }
 
     @Override
     public void attack(Character target) {
-        System.out.println(this.name + " menyerang " + target.getName() + "!");
-        target.takeDamage(this.strength);
-    }
-
-    // Logika Heal ada di Player, bukan di class Skill [cite: 75-76]
-    public void heal() {
-        int healAmount = 20; // Contoh nilai heal
-        this.currentHp += healAmount;
-        if (this.currentHp > this.maxHp)
-            this.currentHp = this.maxHp;
-        System.out.println(this.name + " memulihkan diri sebesar " + healAmount + " HP.");
-    }
-
-    // Dipanggil oleh GameSystem saat musuh kalah [cite: 13]
-    public void gainExp(int exp) {
-        this.currentExp += exp;
-        System.out.println("Mendapatkan " + exp + " EXP.");
-        checkLevelUp();
-    }
-
-    // Menggunakan LevelingManager untuk cek syarat level up
-    private void checkLevelUp() {
-        int reqExp = LevelingManager.getExpRequirement(this.level);
-        while (this.currentExp >= reqExp) {
-            levelUp();
-            reqExp = LevelingManager.getExpRequirement(this.level);
+        if (this.attackSkill.isReady()) {
+            target.takeDamage(super.strength);
+            this.attackSkill.use();
         }
     }
 
-    private void levelUp() {
+    public void heal() {
+        if (this.healSkill.isReady()) {
+            super.currentHp += calculateHealAmount();
+
+            if (super.currentHp > super.maxHP) {
+                super.currentHp = super.maxHP;
+            }
+
+            this.healSkill.use();
+        }
+    }
+
+    @Override
+    public void getInfo() {
+        System.out.println("===== Player Info =====");
+        System.out.println("Name: " + super.name);
+        System.out.println("HP: " + super.currentHp + "/" + super.maxHP);
+        System.out.println("Strength: " + super.strength);
+        System.out.println("Level: " + this.level);
+        System.out.println("EXP: " + this.currentExp + "/" + LevelingManager.getExpRequirement(this.level));
+        System.out.println("===== Skill Info =====");
+        System.out.println("Attack Cooldown: " + this.attackSkill.getCurrentCooldown());
+        System.out.println("Heal amount: " + calculateHealAmount());
+        System.out.println("Heal Cooldown: " + this.healSkill.getCurrentCooldown());
+    }
+
+    public void gainExp(int expAmount) {
+        this.currentExp += expAmount;
+        this.checkLevelUp();
+    }
+
+    public void allocateStatPoint(String statName, int points) {
+        if (this.unusedStatPoints > 0 && points <= this.unusedStatPoints) {
+            int currentAllocated = this.allocatedStats.getOrDefault(statName, 0);
+
+            this.allocatedStats.put(statName, currentAllocated + points);
+            this.unusedStatPoints -= points;
+
+            recalculateStats();
+        }
+    }
+
+    public void decreaseSkillCooldown() {
+        this.attackSkill.decreaseCooldown();
+        this.healSkill.decreaseCooldown();
+    }
+
+    public void resetAllStates() {
+        this.attackSkill.resetCooldown();
+        this.healSkill.resetCooldown();
+        super.setCurrentHp(super.maxHP);
+    }
+
+    private int calculateHealAmount() {
+        return super.maxHP / 5;
+    }
+
+    private void checkLevelUp() {
+        int expRequirement = LevelingManager.getExpRequirement(this.level);
+
+        while (this.currentExp >= expRequirement) {
+            processLevelUp();
+            expRequirement = LevelingManager.getExpRequirement(this.level);
+        }
+    }
+
+    private void processLevelUp() {
         this.currentExp -= LevelingManager.getExpRequirement(this.level);
         this.level++;
 
-        // Update stat saat level up
-        this.maxHp = LevelingManager.calculateNewMaxHp(this.level);
-        this.strength = LevelingManager.calculateNewStrength(this.level);
-        this.currentHp = this.maxHp; // Full heal saat level up
+        Map<String, Integer> levelUpbaseStats = LevelingManager.getBaseStatPoint();
 
-        System.out.println("LEVEL UP! Sekarang level " + this.level);
+        for (String stat : levelUpbaseStats.keySet()) {
+            int currentBase = this.baseStats.getOrDefault(stat, 0);
+            this.baseStats.put(stat, currentBase + levelUpbaseStats.get(stat));
+        }
+
+        this.unusedStatPoints += LevelingManager.getAllocatedStatPoints();
+        this.recalculateStats();
     }
 
-    // Bagian dari Alur Cooldown (Langkah 10 & 11) [cite: 34]
-    public void decreaseSkillCooldown() {
-        for (Skill s : skills) {
-            s.decreaseCooldown();
-        }
+    private void recalculateStats() {
+        int STR = getStat("STR");
+        int VIT = getStat("VIT");
+
+        super.setMaxHP(100 + (VIT * 10));
+        super.setStrength(10 + (STR * 2));
+    }
+
+    private int getStat(String name) {
+        return this.baseStats.getOrDefault(name, 0)
+                + this.allocatedStats.getOrDefault(name, 0);
     }
 }

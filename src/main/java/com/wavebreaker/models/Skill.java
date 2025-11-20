@@ -1,14 +1,28 @@
 package com.wavebreaker.models;
 
 public class Skill {
-    private String name;
-    private int maxCooldown;
+    private final String name;
+    private final int BASE_COOLDOWN;
     private int currentCooldown;
 
-    public Skill(String name, int maxCooldown) {
+    public Skill(String name, int baseCooldown) {
         this.name = name;
-        this.maxCooldown = maxCooldown;
-        this.currentCooldown = 0; // Siap digunakan saat awal
+        this.BASE_COOLDOWN = baseCooldown;
+        this.currentCooldown = 0;
+    }
+
+    public boolean isReady() {
+        return currentCooldown == 0;
+    }
+
+    public void use() {
+        this.currentCooldown = BASE_COOLDOWN;
+    }
+
+    public void decreaseCooldown() {
+        if (this.currentCooldown > 0) {
+            this.currentCooldown--;
+        }
     }
 
     public String getName() {
@@ -19,19 +33,7 @@ public class Skill {
         return currentCooldown;
     }
 
-    // Digunakan saat skill dipakai
-    public void startCooldown() {
-        this.currentCooldown = maxCooldown;
-    }
-
-    // Logika penurunan cooldown (dipanggil oleh Player/Enemy saat fase Cooldown)
-    public void decreaseCooldown() {
-        if (this.currentCooldown > 0) {
-            this.currentCooldown--;
-        }
-    }
-
-    public boolean isReady() {
-        return currentCooldown == 0;
+    public void resetCooldown() {
+        this.currentCooldown = 0;
     }
 }

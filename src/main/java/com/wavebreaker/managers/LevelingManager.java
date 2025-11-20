@@ -1,23 +1,22 @@
 package com.wavebreaker.managers;
 
+import java.util.Map;
+
 public class LevelingManager {
+    private static final int BASE_EXP_REQUIREMENT = 100;
+    private static final double EXP_GROWTH_RATE = 1.2;
 
-    // Private constructor agar tidak bisa diinstansiasi (karena utility class)
-    private LevelingManager() {
-    }
-
-    // Menjawab pertanyaan: "Level X butuh berapa EXP?"
     public static int getExpRequirement(int level) {
-        // Contoh rumus sederhana: Level 1 butuh 100, Level 2 butuh 200, dst.
-        return level * 100;
+        return BASE_EXP_REQUIREMENT * ((int) Math.pow(EXP_GROWTH_RATE, level - 1));
     }
 
-    // Contoh rumus scaling stat (opsional, untuk menunjang fitur level up)
-    public static int calculateNewMaxHp(int level) {
-        return 100 + (level * 20);
+    public static int getAllocatedStatPoints() {
+        return 5;
     }
 
-    public static int calculateNewStrength(int level) {
-        return 10 + (level * 5);
+    public static Map<String, Integer> getBaseStatPoint() {
+        return Map.of(
+                "STR", 5,
+                "VIT", 10);
     }
 }

@@ -2,39 +2,57 @@ package com.wavebreaker.models;
 
 public class Enemy extends Character {
     private int expReward;
+    private EnemyType enemyType;
+    private Skill attackSkill;
 
-    public Enemy(String name, int maxHp, int strength, int expReward) {
-        super(name, maxHp, strength);
+    public Enemy(String name, int maxHP, int strength, int expReward, EnemyType enemyType) {
+        super(name, maxHP, strength);
         this.expReward = expReward;
-    }
+        this.enemyType = enemyType;
 
-    // Getter untuk ExpReward yang akan diambil oleh GameSystem [cite: 13]
-    public int getExpReward() {
-        return expReward;
+        switch (enemyType) {
+            case EnemyType.BOSS:
+                this.attackSkill = new Skill("Basic attack", 4);
+                break;
+
+            case EnemyType.ELITE:
+                this.attackSkill = new Skill("Basic attack", 2);
+                break;
+
+            default:
+                this.attackSkill = new Skill("Basic attack", 1);
+        }
     }
 
     @Override
     public void attack(Character target) {
-        System.out.println("Musuh " + this.name + " menyerang balik!");
-        target.takeDamage(this.strength);
+        if (this.attackSkill.isReady()) {
+            this.attackSkill.use();
+            target.takeDamage(this.strength);
+        }
     }
 
-    // Resep Kloning / Prototype Pattern [cite: 57]
-    // Digunakan oleh WaveManager.nextWave() [cite: 15, 65]
-    public Enemy copy() {
-        // Membuat object baru dengan stat yang sama (sebagai template dasar)
-        return new Enemy(this.name, this.maxHp, this.strength, this.expReward);
-    }
-    
-    // Method untuk scaling musuh (biasanya dipanggil WaveManager setelah copy) [cite: 65]
-    public void scaleStats(int waveNumber) {
-        this.maxHp += (waveNumber * 10);
-        this.strength += waveNumber;
-        this.currentHp = this.maxHp; // Reset HP full untuk musuh baru
+    @Override
+    public void getInfo() {
+        System.out.println("===== Enemy Info =====");
+        System.out.println("Name: " + this.name);
+        System.out.println("Type: " + this.enemyType);
+        System.out.println("HP: " + this.currentHp + "/" + this.maxHP);
+        System.out.println("Strength: " + this.strength);
+        System.out.println("EXP Reward: " + this.expReward);
+        System.out.println("===== Skill Info =====");
+        System.out.println("Attack Cooldown: " + this.attackSkill.getCurrentCooldown());
     }
 
-    // Alur Cooldown untuk musuh (jika musuh punya skill) [cite: 34]
     public void decreaseSkillCooldown() {
-        // Implementasi jika musuh punya skill list
+        this.attackSkill.decreaseCooldown();
+    }
+
+    public Enemy copy(int newStrength, int newMaxHp) {
+        return new Enemy(this.name, newMaxHp, newStrength, this.expReward, this.enemyType);
+    }
+
+    public int getExpReward() {
+        return expReward;
     }
 }

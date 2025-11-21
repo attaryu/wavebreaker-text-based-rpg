@@ -3,23 +3,22 @@ package com.wavebreaker.managers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LevelingManager {
-    private static final int BASE_EXP_REQUIREMENT = 100;
-    private static final double EXP_GROWTH_RATE = 1.25;
+import com.wavebreaker.config.Config;
 
+public class LevelingManager {
     public static int getExpRequirement(int level) {
-        return (int) (BASE_EXP_REQUIREMENT * Math.pow(EXP_GROWTH_RATE, level - 1));
+        return (int) (Config.BASE_EXP_REQUIREMENT * Math.pow(Config.EXP_GROWTH_RATE, level - 1));
     }
 
     public static int getAllocatedStatPoints() {
-        return 3;
+        return Config.ALLOCATED_STAT_POINTS_PER_LEVEL;
     }
 
     public static Map<String, Integer> getBaseStatPoint() {
         HashMap<String, Integer> baseStats = new HashMap<>();
 
-        baseStats.put("STR", 2);
-        baseStats.put("VIT", 3);
+        baseStats.put("STR", Config.BASE_STR_PER_LEVEL);
+        baseStats.put("VIT", Config.BASE_VIT_PER_LEVEL);
 
         return baseStats;
     }

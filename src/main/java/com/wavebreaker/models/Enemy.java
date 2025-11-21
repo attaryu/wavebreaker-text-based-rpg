@@ -1,5 +1,7 @@
 package com.wavebreaker.models;
 
+import com.wavebreaker.config.Config;
+
 public class Enemy extends Character {
     private int expReward;
     private EnemyType enemyType;
@@ -12,15 +14,15 @@ public class Enemy extends Character {
 
         switch (enemyType) {
             case EnemyType.BOSS:
-                this.attackSkill = new Skill("Basic attack", 3);
+                this.attackSkill = new Skill("Basic attack", Config.BOSS_ENEMY_ATTACK_COOLDOWN);
                 break;
 
             case EnemyType.ELITE:
-                this.attackSkill = new Skill("Basic attack", 1);
+                this.attackSkill = new Skill("Basic attack", Config.ELITE_ENEMY_ATTACK_COOLDOWN);
                 break;
 
             default:
-                this.attackSkill = new Skill("Basic attack", 0);
+                this.attackSkill = new Skill("Basic attack", Config.NORMAL_ENEMY_ATTACK_COOLDOWN);
         }
     }
 

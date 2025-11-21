@@ -3,6 +3,7 @@ package com.wavebreaker.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.wavebreaker.config.Config;
 import com.wavebreaker.managers.LevelingManager;
 import com.wavebreaker.utils.Input;
 
@@ -18,7 +19,7 @@ public class Player extends Character {
     private int unusedStatPoints;
 
     public Player(String name) {
-        super(name, 150, 15);
+        super(name, Config.PLAYER_BASE_HP, Config.PLAYER_BASE_STRENGTH);
 
         this.level = 1;
         this.currentExp = 0;
@@ -29,8 +30,8 @@ public class Player extends Character {
         this.allocatedStats.put("VIT", 0);
 
         this.unusedStatPoints = 0;
-        this.attackSkill = new Skill("Attack", 0);
-        this.healSkill = new Skill("Heal", 3);
+        this.attackSkill = new Skill("Attack", Config.PLAYER_ATTACK_COOLDOWN);
+        this.healSkill = new Skill("Heal", Config.PLAYER_HEAL_COOLDOWN);
 
         this.recalculateStats();
     }
@@ -117,9 +118,9 @@ public class Player extends Character {
             return;
         }
 
-        int points = Integer.parseInt(Input.get("Jumlah poin:"));
+        int point = Integer.parseInt(Input.get("Jumlah poin:"));
 
-        if (points <= 0) {
+        if (point <= 0) {
             System.out.println("Jumlah poin harus lebih dari 0, ulangi lagi.");
             allocateStatPoint();
 
@@ -129,10 +130,12 @@ public class Player extends Character {
         if (this.unusedStatPoints > 0) {
             statName = statName.toUpperCase();
 
+            point = point > this.unusedStatPoints ? this.unusedStatPoints : point;
+
             int currentAllocated = this.allocatedStats.getOrDefault(statName, 0);
 
-            this.allocatedStats.put(statName, currentAllocated + points);
-            this.unusedStatPoints -= points;
+            this.allocatedStats.put(statName, currentAllocated + point);
+            this.unusedStatPoints -= point;
 
             recalculateStats();
             this.showStat();
@@ -163,7 +166,7 @@ public class Player extends Character {
     }
 
     private int calculateHealAmount() {
-        return (int) (super.maxHP * 0.40);
+        return (int) (super.maxHP * Config.PLAYER_HEAL_PERCENTAGE);
     }
 
     private void checkLevelUp() {
@@ -199,8 +202,8 @@ public class Player extends Character {
         int STR = getStat("STR");
         int VIT = getStat("VIT");
 
-        super.setMaxHP(150 + (VIT * 9));
-        super.setStrength(15 + (STR * 4));
+        super.setMaxHP(Config.PLAYER_BASE_HP + (VIT * Config.PLAYER_HP_PER_VIT));
+        super.setStrength(Config.PLAYER_BASE_STRENGTH + (STR * Config.PLAYER_STRENGTH_PER_STR));
     }
 
     private int getStat(String name) {

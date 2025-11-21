@@ -20,7 +20,7 @@ public abstract class Character {
             this.currentHP = 0;
         }
 
-        System.out.println(this.name + " terkena " + damage + " damage. Sisa HP: " + this.currentHP);
+        System.out.println("-> " + this.name + " -" + damage + " HP (" + this.currentHP + "/" + this.maxHP + ")");
     }
 
     public abstract void attack(Character target);

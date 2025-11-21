@@ -1,12 +1,10 @@
 package com.wavebreaker.models;
 
 public class Skill {
-    private final String name;
     private final int BASE_COOLDOWN;
     private int currentCooldown;
 
     public Skill(String name, int baseCooldown) {
-        this.name = name;
         this.BASE_COOLDOWN = baseCooldown;
         this.currentCooldown = 0;
     }
@@ -16,8 +14,7 @@ public class Skill {
     }
 
     public void use() {
-        this.currentCooldown = BASE_COOLDOWN;
-        System.out.println("Skill " + this.name + " digunakan!");
+        this.currentCooldown = this.BASE_COOLDOWN + 1;
     }
 
     public void decreaseCooldown() {

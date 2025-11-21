@@ -4,6 +4,7 @@ import com.wavebreaker.managers.CombatManager;
 import com.wavebreaker.managers.WaveManager;
 import com.wavebreaker.models.Enemy;
 import com.wavebreaker.models.Player;
+import com.wavebreaker.utils.Delay;
 import com.wavebreaker.utils.Input;
 
 public class GameEngine {
@@ -11,46 +12,56 @@ public class GameEngine {
   private static final CombatManager combatManager = new CombatManager();
 
   public static void start() {
-    System.out.println("Selamat datang di Wave Breaker!");
+    System.out.println("╔════════════════════════╗");
+    System.out.println("║   WAVE BREAKER - RPG   ║");
+    System.out.println("╚════════════════════════╝");
 
-    String playerName = Input.get("Masukkan nama pemain: ");
+    String playerName = Input.get("\nNama Hero: ");
 
     Player player = new Player(playerName);
 
     do {
       if (player.isPlayerHasUnusedStatPoints()) {
-        System.out.println("Terdapat poin statistik yang belum digunakan!");
-        String menu = Input.get("Apakah Anda ingin mengalokasikannya sekarang? (y/n): ");
+        player.showStat();
+        String menu = Input.get("Alokasi sekarang? (y/n): ");
 
         if (menu.equalsIgnoreCase("y")) {
           player.allocateStatPoint();
         }
       }
 
-      Input.get("Tekan Enter untuk siap ke gelombang berikutnya...");
+      Input.get("\n[Enter] Lanjut wave berikutnya...");
+
+      Delay.clearConsole();
 
       Enemy enemy = waveManager.nextWave();
 
-      player.resetAllStates();
       combatManager.startCombat(player, enemy);
 
       while (!combatManager.isCombatOver()) {
         combatManager.processPlayerTurn();
       }
 
+      Delay.wait(500);
+
       if (player.isAlive()) {
-        System.out.println("Selamat! Gelombang musuh ke-" + waveManager.getCurrentWave() + " telah selesai.");
+        System.out.println("\nWave " + waveManager.getCurrentWave() + " selesai! +" + enemy.getExpReward() + " EXP");
 
         if (waveManager.isWavesEnded()) {
-          System.out.println("Wow! Semua gelombang musuh telah musnah!");
-          System.out.println("Selamat " + player.getName() + ", kamu telah memenangkan permainan!");
+          System.out.println("\n╔════════════════════════╗");
+          System.out.println("║     ANDA MENANG!       ║");
+          System.out.println("╚════════════════════════╝");
+          System.out.println("Selamat " + player.getName() + "!");
 
           break;
         }
 
         player.gainExp(enemy.getExpReward());
+        Delay.wait(400);
       } else {
-        System.out.println("Game Over!");
+        System.out.println("\n╔═══════════════════╗");
+        System.out.println("║     GAME OVER     ║");
+        System.out.println("╚═══════════════════╝");
         break;
       }
     } while (!waveManager.isWavesEnded());

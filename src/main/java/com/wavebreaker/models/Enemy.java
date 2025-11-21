@@ -34,14 +34,12 @@ public class Enemy extends Character {
 
     @Override
     public void showInfo() {
-        System.out.println("===== Enemy Info =====");
-        System.out.println("Name: " + this.name);
-        System.out.println("Type: " + this.enemyType);
-        System.out.println("HP: " + super.currentHP + "/" + super.maxHP);
-        System.out.println("Strength: " + this.strength);
-        System.out.println("EXP Reward: " + this.expReward);
-        System.out.println("===== Skill Info =====");
-        System.out.println("Attack Cooldown: " + this.attackSkill.getCurrentCooldown());
+        String cdInfo = this.attackSkill.getCurrentCooldown() > 0
+                ? " (CD: " + this.attackSkill.getCurrentCooldown() + " ronde)"
+                : "";
+
+        System.out.println("\n[" + super.name + "] " + this.enemyType + " | HP: " + super.currentHP + "/" + super.maxHP
+                + " | ATK: " + super.strength + cdInfo + " | EXP reward: " + this.expReward);
     }
 
     public void decreaseSkillCooldown() {

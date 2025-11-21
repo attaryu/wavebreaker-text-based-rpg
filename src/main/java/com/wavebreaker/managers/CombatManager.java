@@ -2,6 +2,7 @@ package com.wavebreaker.managers;
 
 import com.wavebreaker.models.Enemy;
 import com.wavebreaker.models.Player;
+import com.wavebreaker.utils.Delay;
 import com.wavebreaker.utils.Input;
 
 public class CombatManager {
@@ -23,20 +24,24 @@ public class CombatManager {
 
     public void processPlayerTurn() {
         this.round++;
-        System.out.println("Ronde " + this.round + "!");
+        System.out.println("\n═════ RONDE " + this.round + " ═════");
 
         this.enemy.showInfo();
         this.player.showInfo();
+        this.player.showSkillInfo();
 
-        String action = Input.get("Giliran Anda! Pilih aksi: ");
+        String action = Input.get("\nPilih: ");
 
+        System.out.println();
         if (action.equals("1")) {
             this.player.attack(this.enemy);
         } else if (action.equals("2")) {
             this.player.heal();
         } else {
-            System.out.println("Aksi tidak dikenal, giliran terlewat!");
+            System.out.println("Aksi tidak valid!");
         }
+
+        Delay.wait(400);
 
         if (this.enemy.isAlive()) {
             this.processEnemyTurn();
@@ -44,8 +49,10 @@ public class CombatManager {
     }
 
     private void processEnemyTurn() {
-        System.out.println("Giliran musuh!");
+        System.out.println("\n═════ Giliran Musuh ═════");
+        Delay.wait(300);
         this.enemy.attack(this.player);
+        Delay.wait(400);
         this.processRoundEnd();
     }
 

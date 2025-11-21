@@ -18,15 +18,19 @@ public class Player extends Character {
     private int unusedStatPoints;
 
     public Player(String name) {
-        super(name, 120, 12);
+        super(name, 150, 15);
 
         this.level = 1;
         this.currentExp = 0;
         this.baseStats = LevelingManager.getBaseStatPoint();
         this.allocatedStats = new HashMap<String, Integer>();
+
+        this.allocatedStats.put("STR", 0);
+        this.allocatedStats.put("VIT", 0);
+
         this.unusedStatPoints = 0;
         this.attackSkill = new Skill("Attack", 0);
-        this.healSkill = new Skill("Heal", 4);
+        this.healSkill = new Skill("Heal", 3);
 
         this.recalculateStats();
     }
@@ -41,58 +45,55 @@ public class Player extends Character {
 
     public void heal() {
         if (this.healSkill.isReady()) {
-            super.currentHP += calculateHealAmount();
+            int healAmount = calculateHealAmount();
+            super.currentHP += healAmount;
 
             if (super.currentHP > super.maxHP) {
                 super.currentHP = super.maxHP;
             }
 
+            System.out.println(
+                    "-> " + super.name + " +" + healAmount + " HP (" + super.currentHP + "/" + super.maxHP + ")");
             this.healSkill.use();
+        } else {
+            System.out.println("Heal masih cooldown!");
         }
     }
 
     @Override
     public void showInfo() {
-        System.out.println("===== Player Info =====");
-        System.out.println("Name: " + super.name);
-        System.out.println("HP: " + super.currentHP + "/" + super.maxHP);
-        System.out.println("Strength: " + super.strength);
-        System.out.println("Level: " + this.level);
-        System.out.println("EXP: " + this.currentExp + "/" + LevelingManager.getExpRequirement(this.level));
-
-        this.showSkillInfo();
+        System.out.println("\n[" + super.name + "] Lv." + this.level + " | HP: " + super.currentHP + "/" + super.maxHP
+                + " | ATK: " + super.strength + " | EXP: " + this.currentExp + "/"
+                + LevelingManager.getExpRequirement(this.level));
     }
 
     public void showSkillInfo() {
-        System.out.println("===== Skill Info =====");
+        System.out.println("\n═════ Aksi ═════");
         if (this.attackSkill.isReady()) {
-            System.out.println("[1] Serangan siap digunakan.");
+            System.out.println("[1] Attack (DMG: " + super.strength + ")");
         } else {
-            System.out.println("[x] Cooldown Serangan: " + this.attackSkill.getCurrentCooldown());
+            System.out.println("[x] Attack (CD: " + this.attackSkill.getCurrentCooldown() + ")");
         }
 
         if (this.healSkill.isReady()) {
-            System.out.println("[2] Penyembuhan siap digunakan. " + calculateHealAmount() + " HP akan dipulihkan.");
+            System.out.println("[2] Heal (+" + calculateHealAmount() + " HP)");
         } else {
-            System.out.println("[x] Cooldown Penyembuhan: " + this.healSkill.getCurrentCooldown());
+            System.out.println("[x] Heal (CD: " + this.healSkill.getCurrentCooldown() + " ronde)");
         }
     }
 
     public void showStat() {
-        System.out.println("===== Statistik =====");
+        System.out.println("\n═════ Statistik ═════");
 
         for (String stat : this.baseStats.keySet()) {
             System.out.println("- " + stat + " dasar: " + this.baseStats.get(stat));
         }
 
-        System.out.println("---------------------");
-
         for (String stat : this.allocatedStats.keySet()) {
-            System.out.println("- " + stat + " teralokasi: " + this.allocatedStats.get(stat));
+            System.out.println("- " + stat + " extra: " + this.allocatedStats.get(stat));
         }
 
-        System.out.println("Poin statistik yang belum digunakan: " + this.unusedStatPoints);
-        System.out.println("Statistik yang dialokasikan: ");
+        System.out.println("Sisa poin statistik: " + this.unusedStatPoints);
     }
 
     public void gainExp(int expAmount) {
@@ -101,9 +102,7 @@ public class Player extends Character {
     }
 
     public void allocateStatPoint() {
-        this.showStat();
-
-        String statName = Input.get("Pilih statistik untuk dialokasikan atau batal (STR/VIT/n):");
+        String statName = Input.get("Pilih statistik atau batal (STR/VIT/n):");
 
         if (statName.equalsIgnoreCase("n")) {
             return;
@@ -118,7 +117,7 @@ public class Player extends Character {
             return;
         }
 
-        int points = Integer.parseInt(Input.get("Masukkan jumlah poin:"));
+        int points = Integer.parseInt(Input.get("Jumlah poin:"));
 
         if (points <= 0) {
             System.out.println("Jumlah poin harus lebih dari 0, ulangi lagi.");
@@ -136,6 +135,7 @@ public class Player extends Character {
             this.unusedStatPoints -= points;
 
             recalculateStats();
+            this.showStat();
 
             if (this.isPlayerHasUnusedStatPoints()) {
                 allocateStatPoint();
@@ -163,7 +163,7 @@ public class Player extends Character {
     }
 
     private int calculateHealAmount() {
-        return (int) (super.maxHP * 0.35);
+        return (int) (super.maxHP * 0.40);
     }
 
     private void checkLevelUp() {
@@ -190,8 +190,7 @@ public class Player extends Character {
         int allocatedPoints = LevelingManager.getAllocatedStatPoints();
         this.unusedStatPoints += allocatedPoints;
 
-        System.out.println("Selamat! Anda naik level " + this.level + "!");
-        System.out.println(allocatedPoints + " poin statistik telah ditambahkan!");
+        System.out.println("\nLEVEL UP! Lv." + this.level + " (+" + allocatedPoints + " stat points)");
 
         this.recalculateStats();
     }
@@ -200,8 +199,8 @@ public class Player extends Character {
         int STR = getStat("STR");
         int VIT = getStat("VIT");
 
-        super.setMaxHP(120 + (VIT * 8));
-        super.setStrength(12 + (STR * 3));
+        super.setMaxHP(150 + (VIT * 9));
+        super.setStrength(15 + (STR * 4));
     }
 
     private int getStat(String name) {
